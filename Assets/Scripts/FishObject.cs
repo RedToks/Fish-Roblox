@@ -6,6 +6,13 @@ public class FishObject : MonoBehaviour
 
     public void InitializeFish(FishData fishData)
     {
+        if (fishData == null)
+        {
+            Debug.LogError("fishData is null! Cannot apply fish data.");
+            return;
+        }
+
+
         this.fishData = fishData;
         ApplyFishData();
     }
@@ -36,9 +43,22 @@ public class FishObject : MonoBehaviour
 
             // Устанавливаем материалы
             Renderer[] renderers = GetComponentsInChildren<Renderer>();
+            if (renderers.Length == 0)
+            {
+                Debug.LogWarning("No renderers found on fish object!");
+            }
+
             foreach (Renderer renderer in renderers)
             {
-                renderer.material = fishData.RandomMaterial;
+                if (fishData.RandomMaterial != null)
+                {
+                    Debug.Log("Applying material: " + fishData.RandomMaterial.name);
+                    renderer.material = fishData.RandomMaterial;
+                }
+                else
+                {
+                    Debug.LogWarning("RandomMaterial is null!");
+                }
             }
         }
     }

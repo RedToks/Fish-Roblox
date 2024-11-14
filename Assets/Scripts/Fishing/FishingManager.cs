@@ -13,18 +13,21 @@ public class FishingManager : MonoBehaviour
     [SerializeField] private float fishingStartDelay = 1f; // Задержка перед началом рыбалки
     [SerializeField] private float fishingEndDelay = 1f; // Задержка после завершения рыбалки
 
-    [Header("Fishing Area")]
-    [SerializeField] private FishingAreaTrigger fishingAreaTrigger; // Ссылка на FishingAreaTrigger
 
     [Header("UI Elements")]
     [SerializeField] private GameObject fishingStartButton; // Ссылка на кнопку начала рыбалки
 
     private ThirdPersonController playerMovement;
+    private InventoryUI inventoryUI;
+    private Game game;
     private IUIManager uiManager;
+    private SeaType currentSeaType;
     private bool isFishingActive = false;
 
     private void Start()
     {
+        game = FindObjectOfType<Game>();
+        inventoryUI = FindObjectOfType<InventoryUI>();
         uiManager = FindObjectOfType<UIManager>();
         playerMovement = FindObjectOfType<ThirdPersonController>();
         fishingStartButton.SetActive(false);
@@ -32,25 +35,32 @@ public class FishingManager : MonoBehaviour
     }
     private void Update()
     {
-        // Only show the fishing start button when the player is in the fishing area and is not fishing
-        if (!isFishingActive && fishingAreaTrigger.IsInFishingArea)
+        bool isInAnyFishingArea = false;
+
+        // Проверяем все зоны рыбалки и показываем кнопку, если игрок в одной из них
+        foreach (var fishingArea in FindObjectsOfType<FishingAreaTrigger>())
         {
-            fishingStartButton.SetActive(true); // Show button when in fishing area
+            if (fishingArea.IsInFishingArea) // Если игрок в зоне рыбалки
+            {
+                isInAnyFishingArea = true;
+                currentSeaType = fishingArea.seaType; // Обновляем тип моря для текущей зоны
+                break; // Если хотя бы одна зона активна, не нужно проверять остальные
+            }
+        }
+
+        if (!isFishingActive && isInAnyFishingArea)
+        {
+            fishingStartButton.SetActive(true); // Показать кнопку, если игрок в любой зоне рыбалки
         }
         else
         {
-            fishingStartButton.SetActive(false); // Hide button when the player starts fishing
+            fishingStartButton.SetActive(false); // Скрыть кнопку, если рыбалка началась или нет зоны
         }
     }
+
     public void StartFishingProcess()
     {
         if (isFishingActive) return;
-
-        if (!fishingAreaTrigger.IsInFishingArea)
-        {
-            feedbackText.text = "Нужно попасть в область рыбалки!";
-            return;
-        }
 
         isFishingActive = true;
         uiManager.HideUI();
@@ -80,16 +90,28 @@ public class FishingManager : MonoBehaviour
     {
         if (!isFishingActive) return;
 
+        FishData caughtFish = game.CreateFishFromSea(currentSeaType);
+        if (caughtFish != null)
+        {
+            // Создаем 3D объект рыбы для иконки
+            GameObject fishModel = Instantiate(caughtFish.Prefab, Vector3.zero, Quaternion.identity);
+            fishModel.SetActive(false); // Делаем его невидимым
+
+            // Добавляем рыбу и её модель в инвентарь
+            Inventory.instance.AddFishItem(caughtFish, fishModel);
+            inventoryUI.UpdateInventoryUI();
+            Debug.Log($"Поймана рыба из {currentSeaType}!");
+        }
+
         playerMovement.velocity = playerMovement.StartVelocity;
         uiManager.ShowUI();
         isFishingActive = false;
         fishingButtonPhase.EndPhase();
-
-        // Сбросить состояние UI после рыбалки
-        fishingStartButton.SetActive(true); // Показать кнопку старта
+        fishingStartButton.SetActive(true);
 
         StartCoroutine(FishingEndSequence());
     }
+
 
     // Последовательность завершения рыбалки
     private IEnumerator FishingEndSequence()

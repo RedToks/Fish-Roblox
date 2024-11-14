@@ -1,11 +1,20 @@
-using UnityEditor;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 public class InventoryItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public ItemData itemData { get; private set; }
+
+    // Цвета для различных уровней редкости
+    private Dictionary<string, Color> rarityColors = new Dictionary<string, Color>
+    {
+        { "обычная", Color.white },
+        { "редкая", new Color(0.14f, 0, 0.97f) },
+        { "эпическая", new Color(0.75f, 0, 0.97f) }, // Фиолетовый
+        { "мифическая", new Color(0.97f, 0, 0) }, // Оранжевый
+        { "легендарная", new Color(1f, 0.98f, 0f) }    // Золотой
+    };
 
     public void Initialize(ItemData data)
     {
@@ -17,10 +26,10 @@ public class InventoryItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (itemData is FishData fishData)
         {
             string materialName = fishData.RandomMaterial.name;
-            float materialMultiplier = FishData.GetMaterialMultiplier(fishData.RandomMaterial);
+            float materialMultiplier = fishData.GetRarityMultiplier(fishData.rarity);
 
             Tooltip.Show(
-                $"Имя: {fishData.Name} (<color=#{ColorUtility.ToHtmlStringRGB(GetMaterialColor(fishData))}>{materialName}</color>)\n" +
+                $"Имя: {fishData.Name} (<color=#{ColorUtility.ToHtmlStringRGB(fishData.RarityColor)}>{materialName}</color>)\n" +
                 $"Размер: {fishData.RandomSize:F2}\n" +
                 $"Базовая стоимость: {FishData.BasePrice} + {materialMultiplier:F2}x\n" +
                 $"Стоимость: {CurrencyFormatter.FormatCurrency(fishData.Price)}\n" +
@@ -28,50 +37,21 @@ public class InventoryItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExit
                 $"Море: {fishData.SeaType}"
             );
         }
-        else
+        else if (itemData is FishingRodData fishingRod)
         {
-            Tooltip.Show($"Имя: {itemData.Name}");
-        }
-    }
+            // Форматируем редкость цветом, а остальной текст оставляем обычным
+            string chances =
+                $"Шанс на <color=#{ColorUtility.ToHtmlStringRGB(rarityColors["обычная"])}>обычную</color> рыбу: {fishingRod.rodlvlCommon * 100:F1}%\n" +
+                $"Шанс на <color=#{ColorUtility.ToHtmlStringRGB(rarityColors["редкая"])}>редкую</color> рыбу: {fishingRod.rodlvlRare * 100:F1}%\n" +
+                $"Шанс на <color=#{ColorUtility.ToHtmlStringRGB(rarityColors["эпическая"])}>эпическую</color> рыбу: {fishingRod.rodlvlEpic * 100:F1}%\n" +
+                $"Шанс на <color=#{ColorUtility.ToHtmlStringRGB(rarityColors["мифическая"])}>мифическую</color> рыбу: {fishingRod.rodlvlMythic * 100:F1}%\n" +
+                $"Шанс на <color=#{ColorUtility.ToHtmlStringRGB(rarityColors["легендарная"])}>легендарную</color> рыбу: {fishingRod.rodlvlLegendary * 100:F1}%";
 
-    // Функция для получения цвета материала на основе его категории с использованием RGB
-    public Color GetMaterialColor(FishData fishData)
-    {
-        if (fishData?.RandomMaterial == null)
-        {
-            Debug.LogError("Material is null in GetMaterialColor.");
-            return Color.black;
-        }
-
-        // Получаем путь материала с учетом типа моря
-        string seaPath = fishData.SeaType.ToString(); // Получаем название моря
-        string path = AssetDatabase.GetAssetPath(fishData.RandomMaterial);
-
-        // Проверяем, какой путь соответствует материалу в данном море
-        if (path.Contains($"/Resources/Materials/{seaPath}/Legendary/"))
-        {
-            return new Color(1f, 1f, 0f);  // Легендарный (желтый)
-        }
-        else if (path.Contains($"/Resources/Materials/{seaPath}/Mythic/"))
-        {
-            return new Color(1f, 0.41f, 0.71f);  // Мифический (розовый)
-        }
-        else if (path.Contains($"/Resources/Materials/{seaPath}/Epic/"))
-        {
-            return new Color(0.6f, 0.4f, 0.8f);  // Эпический (синий)
-        }
-        else if (path.Contains($"/Resources/Materials/{seaPath}/Rare/"))
-        {
-            return new Color(0f, 0f, 1f); // Редкий (синий)
-        }
-        else if (path.Contains($"/Resources/Materials/{seaPath}/Default/"))
-        {
-            return new Color(1f, 1f, 1f);  // Обычный (белый)
-        }
-        else
-        {
-            Debug.LogWarning($"Unknown material category: {path}");
-            return Color.black;  // По умолчанию черный цвет, если категория не найдена
+            Tooltip.Show(
+                $"Имя: {fishingRod.Name}\n" +
+                $"Уровень: {fishingRod.Level}\n\n" +
+                chances
+            );
         }
     }
 

@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 038efdc102ba2e64d928b1625fcf1fc2, type: 3}
+  m_Name: lvl3
+  m_EditorClassIdentifier: 
+  Price: 1000000
+  Name: lvl3
+  Sprite: {fileID: 21300000, guid: f628c5d94d73e214fa46ac26c8506ce0, type: 3}
+  Level: 3
+  rodlvlCommon: 0.1
+  rodlvlRare: 0.3
+  rodlvlEpic: 0.3
+  rodlvlMythic: 0.2
+  rodlvlLegendary: 0.1

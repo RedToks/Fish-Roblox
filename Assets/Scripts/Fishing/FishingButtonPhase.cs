@@ -16,8 +16,8 @@ public class FishingButtonPhase : MonoBehaviour
     [SerializeField] private int maxCatchAttempts = 10;
     [SerializeField] private float newButtonDelay = 1;
 
-    [Header("Fishing Area")]
-    [SerializeField] private FishingAreaTrigger fishingAreaTrigger;
+    [Header("Fishing Areas")]
+    [SerializeField] private FishingAreaTrigger fishingAreaTriggers;
 
     private int currentClicks;
     private int targetClicks;
@@ -33,18 +33,29 @@ public class FishingButtonPhase : MonoBehaviour
         sliderFishingScript = FindObjectOfType<SliderFishing>();
     }
 
-
     public void StartFishing()
     {
-        if (isFishing || !fishingAreaTrigger.IsInFishingArea) return;
+        // Проверяем, в какой зоне рыбалки находится игрок
+        if (isFishing || !IsPlayerInAnyFishingArea()) return;
 
         isFishing = true;
         feedbackText.gameObject.SetActive(true);
         feedbackText.text = "Заброс удочки...";
 
-
         targetClicks = Random.Range(minCatchAttempts, maxCatchAttempts + 1);
         StartCoroutine(FishingRoutine());
+    }
+
+    private bool IsPlayerInAnyFishingArea()
+    {
+        foreach (var fishingArea in FindObjectsOfType<FishingAreaTrigger>())
+        {
+            if (fishingArea.IsInFishingArea)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private IEnumerator FishingRoutine()
@@ -87,9 +98,8 @@ public class FishingButtonPhase : MonoBehaviour
         EndPhase();
         yield return new WaitForSeconds(2f);
 
-        feedbackText.gameObject.SetActive(false);       
+        feedbackText.gameObject.SetActive(false);
         fishingManager.EndFishingProcess();
-
     }
 
     public void OnCatchButtonClick()

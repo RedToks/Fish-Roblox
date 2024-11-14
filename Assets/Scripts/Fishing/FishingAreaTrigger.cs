@@ -2,9 +2,7 @@ using UnityEngine;
 
 public class FishingAreaTrigger : MonoBehaviour
 {
-    [SerializeField] private Sea seaData; // —сылка на данные мор€
-
-    public Sea SeaData => seaData;
+    public SeaType seaType; // —сылка на объект Sea дл€ данной зоны
     public bool IsInFishingArea { get; private set; }
 
     private void OnTriggerStay(Collider other)
@@ -13,6 +11,7 @@ public class FishingAreaTrigger : MonoBehaviour
         {
             IsInFishingArea = true;
             playerInteraction.SetCurrentFishingArea(this);
+            Debug.Log($"»грок в зоне: {seaType}");
         }
     }
 

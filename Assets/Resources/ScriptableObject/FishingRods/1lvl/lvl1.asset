@@ -9,9 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5fcfaf38997b9424688751570f590da8, type: 3}
-  m_Name: "\u041B\u043E\u043F\u0430\u0442\u0430"
+  m_Script: {fileID: 11500000, guid: 038efdc102ba2e64d928b1625fcf1fc2, type: 3}
+  m_Name: lvl1
   m_EditorClassIdentifier: 
-  Price: 0
-  ItemName: "\u041B\u043E\u043F\u0430\u0442\u0430"
-  Sprite: {fileID: 21300000, guid: 1cd1c1abe030e2b4d9677759eadf6990, type: 3}
+  Price: 1000
+  Name: lvl1
+  Sprite: {fileID: 21300000, guid: 56caa0656063e1447bc32b6882b4b09f, type: 3}
+  Level: 1
+  CatchSpeedModifier: 0
+  RarityIncrease: 0

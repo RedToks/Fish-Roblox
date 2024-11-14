@@ -9,14 +9,15 @@ public class InventoryUI : MonoBehaviour
     [SerializeField] private Shop _shop;
     [SerializeField] private PlayerInteraction _playerInteraction;
 
+
     private void Start()
     {
         UpdateInventoryUI();
-    }   
+    }
 
     public void UpdateInventoryUI()
     {
-        var items = Inventory.instance.Items;
+        var items = Inventory.instance.items;
 
         for (int i = 0; i < inventoryButtons.Length; i++)
         {
@@ -33,41 +34,91 @@ public class InventoryUI : MonoBehaviour
 
     private void SetUpInventoryButton(Button button, ItemData item)
     {
-        var textComponent = button.GetComponentInChildren<TextMeshProUGUI>();
-        if (textComponent != null)
-        {
-            textComponent.text = item.Name;
-        }
+        // Найдём дочерний объект, содержащий рамку (предполагаем, что рамка - это первый дочерний объект с компонентом Image)
+        Image frameImage = button.transform.GetChild(0).GetComponent<Image>();
 
+        // Устанавливаем изображение на кнопке
         var image = button.GetComponent<Image>();
         if (image != null)
         {
             image.sprite = item.Sprite;
         }
 
-        var inventoryItemUI = button.gameObject.GetComponent<InventoryItemUI>();
-        if (inventoryItemUI == null)
+        // Проверка типа предмета
+        if (item is FishData fishData)
         {
-            inventoryItemUI = button.gameObject.AddComponent<InventoryItemUI>();
+            // Устанавливаем цвет рамки на основе редкости рыбы
+            if (frameImage != null)
+            {
+                frameImage.color = fishData.RarityColor;
+            }
+
+            // Добавляем UI для отображения данных рыбы
+            var inventoryItemUI = button.gameObject.GetComponent<InventoryItemUI>();
+            if (inventoryItemUI == null)
+            {
+                inventoryItemUI = button.gameObject.AddComponent<InventoryItemUI>();
+            }
+            inventoryItemUI.Initialize(item);
+
+            button.onClick.RemoveAllListeners();
+
+            // Если магазин открыт, продаём рыбу
+            if (_shop.shopIsOpen)
+            {
+                button.onClick.AddListener(() => _shop.AttemptToSellItem(item, button));
+            }
+            else
+            {
+                // Иначе выбрасываем рыбу
+                button.onClick.AddListener(() => _playerInteraction.ThrowFish(fishData));
+            }
         }
-        inventoryItemUI.Initialize(item);
-
-        button.onClick.RemoveAllListeners();
-
-        // Если игрок в магазине, то кнопка продает предмет
-        if (_shop.shopIsOpen)
+        else if (item is FishingRodData rodData)
         {
-            button.onClick.AddListener(() => _shop.AttemptToSellItem(item, button));
+            // Если это удочка, добавляем логику улучшения
+            if (frameImage != null)
+            {
+                frameImage.color = Color.green; // или другой цвет для удочки
+            }
+
+            var inventoryItemUI = button.gameObject.GetComponent<InventoryItemUI>();
+            if (inventoryItemUI == null)
+            {
+                inventoryItemUI = button.gameObject.AddComponent<InventoryItemUI>();
+            }
+            inventoryItemUI.Initialize(item);
+
+            button.onClick.RemoveAllListeners();
+
+            // Если магазин открыт, пытаемся улучшить удочку
+            if (_shop.shopIsOpen)
+            {
+                button.onClick.AddListener(() => _shop.AttemptToUpgradeRod(rodData, button));
+            }
+            else
+            {
+                // Логика для действия, если магазин закрыт (например, использование удочки, если это необходимо)
+                // button.onClick.AddListener(() => _playerInteraction.UseFishingRod(rodData));
+            }
         }
         else
         {
-            // Если не в магазине, то кнопка выбрасывает предмет
-            button.onClick.AddListener(() => _playerInteraction.ThrowFish(item as FishData));
+            // Настройки для других типов предметов (не рыба и не удочка)
+            if (frameImage != null)
+            {
+                frameImage.color = Color.white; // или другой цвет по умолчанию
+            }
+
+            // Добавить действия для других предметов
+            button.onClick.RemoveAllListeners();
         }
 
+        // Активируем кнопку после настройки
         button.gameObject.SetActive(true);
-        Tooltip.Hide();
     }
+
+
 
 
 
@@ -75,6 +126,7 @@ public class InventoryUI : MonoBehaviour
 
     private void HideInventoryButton(Button button)
     {
+        Tooltip.Hide();
         button.gameObject.SetActive(false);
     }
 }

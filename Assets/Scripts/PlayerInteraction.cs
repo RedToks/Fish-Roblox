@@ -27,7 +27,7 @@ public class PlayerInteraction : MonoBehaviour
         {
             isNearFish = true;
             fishObject = other.gameObject;
-            fishData = fish?.fishData;  // Сохраняем данные рыбы
+            fishData = fish?.fishData;
         }
     }
 
@@ -49,26 +49,19 @@ public class PlayerInteraction : MonoBehaviour
         currentFishingArea = fishingArea;
     }
 
-    private void AddFishToInventory()
+    public void AddFishToInventory()
     {
-        if (fishData != null && !Inventory.instance.IsFull())
-        {
             FishData uniqueFishData = fishData.Clone();
-            Inventory.instance.AddItem(uniqueFishData);
+            Inventory.instance.AddFishItem(uniqueFishData, fishObject);
             Destroy(fishObject);
             fishObject = null;
             fishData = null;
             inventoryUI.UpdateInventoryUI();
-        }
-        else
-        {
-            Debug.Log("Инвентарь полон или рыба не найдена.");
-        }
     }
 
     public void ThrowFish(FishData fish)
     {
-        if (fish != null)
+        if (fish != null)   
         {
             // Создаем новый объект рыбы в мире
             var fishObject = Instantiate(fish.Prefab, throwPoint.position, Quaternion.identity);
