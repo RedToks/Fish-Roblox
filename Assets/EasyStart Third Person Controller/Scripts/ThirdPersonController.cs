@@ -92,8 +92,6 @@ public class ThirdPersonController : MonoBehaviour
             // Disable crounching when jumping
             //isCrouching = false; 
         }
-
-        HeadHittingDetect();
     }
 
     // FixedUpdate is responsible for applying movements and actions to the player
@@ -159,22 +157,5 @@ public class ThirdPersonController : MonoBehaviour
 
         Vector3 moviment = verticalDirection + horizontalDirection;
         cc.Move(moviment);
-    }
-
-    //This function makes the character end his jump if he hits his head on something
-    void HeadHittingDetect()
-    {
-        float headHitDistance = 1.1f;
-        Vector3 ccCenter = transform.TransformPoint(cc.center);
-        float hitCalc = cc.height / 2f * headHitDistance;
-
-        // Uncomment this line to see the Ray drawed in your characters head
-        // Debug.DrawRay(ccCenter, Vector3.up * headHeight, Color.red);
-
-        if (Physics.Raycast(ccCenter, Vector3.up, hitCalc))
-        {
-            jumpElapsedTime = 0;
-            isJumping = false;
-        }
     }
 }

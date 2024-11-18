@@ -119,11 +119,6 @@ public class InventoryUI : MonoBehaviour
     }
 
 
-
-
-
-
-
     private void HideInventoryButton(Button button)
     {
         Tooltip.Hide();

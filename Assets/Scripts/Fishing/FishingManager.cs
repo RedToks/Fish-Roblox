@@ -22,7 +22,7 @@ public class FishingManager : MonoBehaviour
     private Game game;
     private IUIManager uiManager;
     private SeaType currentSeaType;
-    private bool isFishingActive = false;
+    public bool isFishingActive { get; private set; } = false;
 
     private void Start()
     {
@@ -86,21 +86,27 @@ public class FishingManager : MonoBehaviour
     }
 
     // Метод для завершения рыбалки
-    public void EndFishingProcess()
+    public void EndFishingProcess(bool isFishCaught)
     {
         if (!isFishingActive) return;
 
-        FishData caughtFish = game.CreateFishFromSea(currentSeaType);
-        if (caughtFish != null)
+        if (isFishCaught)
         {
-            // Создаем 3D объект рыбы для иконки
-            GameObject fishModel = Instantiate(caughtFish.Prefab, Vector3.zero, Quaternion.identity);
-            fishModel.SetActive(false); // Делаем его невидимым
+            // Здесь создаем рыбу, если она была поймана
+            FishData caughtFish = game.CreateFishFromSea(currentSeaType);
+            if (caughtFish != null)
+            {
+                GameObject fishModel = Instantiate(caughtFish.Prefab, Vector3.zero, Quaternion.identity);
+                fishModel.SetActive(false);
 
-            // Добавляем рыбу и её модель в инвентарь
-            Inventory.instance.AddFishItem(caughtFish, fishModel);
-            inventoryUI.UpdateInventoryUI();
-            Debug.Log($"Поймана рыба из {currentSeaType}!");
+                Inventory.instance.AddFishItem(caughtFish, fishModel);
+                inventoryUI.UpdateInventoryUI();
+                Debug.Log($"Поймана рыба из {currentSeaType}!");
+            }
+        }
+        else
+        {
+            Debug.Log("Игрок не успел, рыба не поймана.");
         }
 
         playerMovement.velocity = playerMovement.StartVelocity;
@@ -111,6 +117,7 @@ public class FishingManager : MonoBehaviour
 
         StartCoroutine(FishingEndSequence());
     }
+
 
 
     // Последовательность завершения рыбалки

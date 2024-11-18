@@ -71,7 +71,7 @@ public class SliderFishing : MonoBehaviour
             else
             {
                 fishingProgressSlider.value -= progressDecreaseRate * Time.deltaTime;
-                feedbackText.text = "Рыба ускользает";
+                feedbackText.text = "рыба ускользает";
             }
 
             if (fishingProgressSlider.value >= 1f)
@@ -79,14 +79,14 @@ public class SliderFishing : MonoBehaviour
                 feedbackText.text = "Вы поймали рыбу!";
                 StartCoroutine(FadeOutText());
                 EndFishing();
-                fishingManager.EndFishingProcess();
+                fishingManager.EndFishingProcess(true);
             }
             else if (fishingProgressSlider.value <= 0f)
             {
-                feedbackText.text = "Рыба ускользнула!";
+                feedbackText.text = "рыба ускользнула!";
                 StartCoroutine(FadeOutText());
                 EndFishing();
-                fishingManager.EndFishingProcess();
+                fishingManager.EndFishingProcess(false);
             }
         }
     }

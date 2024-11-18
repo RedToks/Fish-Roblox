@@ -1,6 +1,9 @@
+using UnityEngine;
+
 [System.Serializable]
 public class FishingRodData : ItemData
 {
+
     public int Level;
 
     public float rodlvlCommon = 0.50f;

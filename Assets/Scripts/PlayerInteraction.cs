@@ -51,7 +51,13 @@ public class PlayerInteraction : MonoBehaviour
 
     public void AddFishToInventory()
     {
-            FishData uniqueFishData = fishData.Clone();
+        if (Inventory.instance.IsFull())
+        {
+            Debug.Log("Инвентарь полон, рыба не может быть добавлена.");
+            return; // Если инвентарь полон, прекращаем выполнение метода
+        }
+
+        FishData uniqueFishData = fishData.Clone();
             Inventory.instance.AddFishItem(uniqueFishData, fishObject);
             Destroy(fishObject);
             fishObject = null;

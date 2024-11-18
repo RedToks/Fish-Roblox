@@ -39,7 +39,16 @@ public class CameraController : MonoBehaviour
             UnityEngine.Cursor.lockState = CursorLockMode.Locked;
             UnityEngine.Cursor.visible = false;
         }
+
+        // Load sensitivity from saved settings (if available)
+        SaveLoad saveLoad = FindObjectOfType<SaveLoad>();
+        if (saveLoad != null)
+        {
+            GameSettings settings = saveLoad.LoadSettings();
+            sensitivity = settings.sensitivity;
+        }
     }
+
 
     void Update()
     {

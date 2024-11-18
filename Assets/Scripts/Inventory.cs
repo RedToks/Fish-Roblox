@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Inventory : MonoBehaviour
@@ -10,7 +11,8 @@ public class Inventory : MonoBehaviour
     private InventoryUI inventoryUI;
 
     // Переменная для отслеживания уровня удочки
-    public int RodLvl { get; private set; } = 1;  // Начальный уровень удочки - 1
+    [Serialize] public int RodLvl { get; private set; } = 1;  // Начальный уровень удочки - 1
+
 
     private void Awake()
     {
@@ -27,9 +29,12 @@ public class Inventory : MonoBehaviour
     private void Start()
     {
         inventoryUI = FindObjectOfType<InventoryUI>();
-        AddInitialItem(firstFishingRod);
+        inventoryUI.UpdateInventoryUI();
+        if (items.Count == 0)
+        {
+            AddInitialItem(firstFishingRod);
+        }
     }
-
     private void AddInitialItem(FishingRodData item)
     {
         // Check if the item is already in the inventory
@@ -59,7 +64,7 @@ public class Inventory : MonoBehaviour
 
     public void ReplaceItemInInventory(ItemData newItem)
     {
-        int index = items.FindIndex(item => item is FishingRodData);
+        int index = items.FindIndex(item => item is FishingRodData rod && rod.Level == RodLvl);
         if (index >= 0)
         {
             items[index] = newItem;
@@ -110,22 +115,15 @@ public class Inventory : MonoBehaviour
     {
         if (rodData == null) return;
 
-        // Устанавливаем уровень удочки в зависимости от ее типа
-        if (rodData.Name.Contains("lvl1"))
+        // Обновляем уровень, если он отличается от текущего
+        if (rodData.Level != RodLvl)
         {
-            RodLvl = 1;
+            RodLvl = rodData.Level;
+            PlayerPrefs.SetInt("RodLvl", RodLvl);
+            Debug.Log($"Fishing rod level set to: {RodLvl}");
         }
-        else if (rodData.Name.Contains("lvl2"))
-        {
-            RodLvl = 2;
-        }
-        else if (rodData.Name.Contains("lvl3"))
-        {
-            RodLvl = 3;
-        }
-
-        Debug.Log($"Fishing rod level set to: {RodLvl}");
     }
+
 
     public FishingRodData GetCurrentFishingRodData()
     {
@@ -135,53 +133,87 @@ public class Inventory : MonoBehaviour
 
     private Sprite GenerateIcon(GameObject fishModel, Material fishMaterial)
     {
-        // Включаем модель рыбы для рендеринга иконки
+        // Сохраняем исходное состояние рыбы
+        Vector3 originalPosition = fishModel.transform.position;
+        Quaternion originalRotation = fishModel.transform.rotation;
+        Vector3 originalScale = fishModel.transform.localScale;
+
+        // Перемещаем рыбу на новую позицию для рендера
+        fishModel.transform.position = Vector3.zero;
+        fishModel.transform.rotation = Quaternion.identity;
+        fishModel.transform.localScale = Vector3.one;
+
+        // Включаем модель рыбы
         fishModel.SetActive(true);
 
-        // Поворачиваем рыбу на -90 градусов (например, вокруг оси Y)
-        fishModel.transform.rotation = Quaternion.Euler(0, -90, 0);
-
-        // Получаем все MeshRenderer в дочерних объектах
-        MeshRenderer[] renderers = fishModel.GetComponentsInChildren<MeshRenderer>();
+        // Получаем все Renderer компоненты (включая MeshRenderer) в дочерних объектах
+        Renderer[] renderers = fishModel.GetComponentsInChildren<Renderer>();
         if (renderers.Length == 0)
         {
-            Debug.LogWarning("No MeshRenderers found on fish model or its children.");
+            Debug.LogWarning("No Renderers found on fish model or its children.");
             return null;
         }
 
-        // Применяем материал ко всем найденным MeshRenderer
-        foreach (MeshRenderer renderer in renderers)
+        // Применяем материал ко всем найденным Renderer
+        foreach (Renderer renderer in renderers)
         {
             renderer.material = fishMaterial;
         }
 
-        // Настроим камеру для рендеринга модели в иконку
+        // Создаем камеру для рендера
         Camera iconCamera = new GameObject("IconCamera").AddComponent<Camera>();
-        iconCamera.transform.position = fishModel.transform.position + new Vector3(0, 1, -2);
-        iconCamera.transform.LookAt(fishModel.transform);
         iconCamera.orthographic = true;
-        iconCamera.orthographicSize = 0.5f; // Уменьшаем размер камеры
         iconCamera.clearFlags = CameraClearFlags.SolidColor;
         iconCamera.backgroundColor = Color.clear;
 
-        // Создаём RenderTexture для рендера иконки
+        // Получаем все рендереры, чтобы вычислить размеры объекта
+        Bounds bounds = renderers[0].bounds;
+        foreach (var renderer in renderers)
+        {
+            bounds.Encapsulate(renderer.bounds);
+        }
+
+        // Находим центр объекта
+        Vector3 center = bounds.center;
+
+        // Устанавливаем камеру, чтобы она смотрела на центр объекта
+        iconCamera.transform.position = center + new Vector3(0, 1, -2);  // Сдвигаем камеру на небольшое расстояние
+        iconCamera.transform.LookAt(center);
+
+        // Вычисляем подходящий размер камеры, чтобы весь объект поместился в кадр
+        float objectHeight = bounds.size.y;  // Высота объекта
+        float objectWidth = bounds.size.x;   // Ширина объекта
+        float maxObjectSize = Mathf.Max(objectHeight, objectWidth);
+
+        // Устанавливаем размер камеры в зависимости от объекта
+        iconCamera.orthographicSize = maxObjectSize / 2 + 0.1f; // Немного добавляем для отступа
+
+        // Создаем RenderTexture для рендера иконки
         RenderTexture renderTexture = new RenderTexture(256, 256, 16);
         iconCamera.targetTexture = renderTexture;
         iconCamera.Render();
 
-        // Создаём иконку из RenderTexture
+        // Создаем иконку из RenderTexture
         RenderTexture.active = renderTexture;
         Texture2D iconTexture = new Texture2D(256, 256, TextureFormat.ARGB32, false);
         iconTexture.ReadPixels(new Rect(0, 0, 256, 256), 0, 0);
         iconTexture.Apply();
         RenderTexture.active = null;
 
-        // Преобразуем Texture2D в Sprite
-        Sprite icon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.one * 0.5f);
-
+        // Удаляем временную камеру и объект после рендера
         Destroy(iconCamera.gameObject);
         Destroy(fishModel);
 
+        // Восстанавливаем исходное состояние рыбы
+        fishModel.transform.position = originalPosition;
+        fishModel.transform.rotation = originalRotation;
+        fishModel.transform.localScale = originalScale;
+
+        // Преобразуем Texture2D в Sprite
+        Sprite icon = Sprite.Create(iconTexture, new Rect(0, 0, iconTexture.width, iconTexture.height), Vector2.one * 0.5f);
+
         return icon;
     }
+
 }
+

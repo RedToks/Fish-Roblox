@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: lvl2
   m_EditorClassIdentifier: 
   Price: 10000
-  Name: lvl2
-  Sprite: {fileID: 21300000, guid: a10d79911bca849448e256780a7052cf, type: 3}
+  Name: "\u0423\u0434\u043E\u0447\u043A\u0430"
+  Sprite: {fileID: 21300000, guid: de372a6c3c6d5a6418565149a08a4b79, type: 3}
   Level: 2
   rodlvlCommon: 0.3
   rodlvlRare: 0.35

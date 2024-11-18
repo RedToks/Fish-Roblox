@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 public enum Rarity
@@ -12,9 +13,9 @@ public enum Rarity
 }
 public enum SeaType
 {
-    First,
-    Second,
-    Third
+    Стандартное,
+    Ледовитое,
+    Лавовое
 }
 
 public class FishData : ItemData
@@ -27,15 +28,13 @@ public class FishData : ItemData
     public Material RandomMaterial;
     public int Experience;
     public SeaType SeaType;
+    public string SpritePath;
 
     public Material Material => RandomMaterial;
 
-    public static readonly int BasePrice = 100;
-
-
+    public int BasePrice = 100;
     // Словарь для коэффициентов стоимости в зависимости от материала
     private static readonly Dictionary<Material, float> MaterialPriceMultipliers = new Dictionary<Material, float>();
-
     public FishData(GameObject prefab, string name, Sprite sprite, SeaType seaType)
     {
         Prefab = prefab;
@@ -43,16 +42,19 @@ public class FishData : ItemData
         Sprite = sprite;
         SeaType = seaType;
 
-        // Загрузить материалы на основе текущего моря
+        // Initialize materials, random size, and material multiplier
         Materials = LoadMaterialsByCategory();
-
         InitializeMaterialMultipliers();
+
         RandomMaterial = GetRandomMaterial();
         RandomSize = GetRandomSize();
+
+        // Set Price and Experience, but don't re-set them unless necessary
         Price = CalculatePrice();
-        Experience = Price / 2;
+        Experience = Price / 2;  // Only calculate Experience once
         RarityColor = GetRarityColor();
     }
+
 
     public Color GetRarityColor()
     {
@@ -224,11 +226,14 @@ public class FishData : ItemData
     public FishData Clone()
     {
         FishData clone = new FishData(Prefab, Name, Sprite, SeaType);
+
         clone.RandomMaterial = RandomMaterial;
         clone.RandomSize = RandomSize;
+
         clone.rarity = rarity;
         clone.RarityColor = RarityColor;
         clone.Price = Price;
+        clone.Experience = Experience;
         clone.SeaType = SeaType;
         return clone;
     }
@@ -236,11 +241,10 @@ public class FishData : ItemData
     public int CalculatePrice()
     {
         // Получаем множитель для редкости (с учётом случайного диапазона для редкости)
-        float rarityMultiplier = GetRarityMultiplier(rarity);
 
 
         // Рассчитываем итоговую цену
-        float finalPrice = BasePrice * RandomSize * rarityMultiplier;
+        float finalPrice = BasePrice * RandomSize * GetRarityMultiplier(rarity);
 
         // Округляем цену и возвращаем её
         return Mathf.RoundToInt(finalPrice);
@@ -248,39 +252,32 @@ public class FishData : ItemData
 
     public float GetRarityMultiplier(Rarity rarity)
     {
-        // Диапазоны для каждого типа редкости
-        float minMultiplier = 1f;
-        float maxMultiplier = 1f;
+        // Фиксированные множители для каждого типа редкости
+        float multiplier = 1f;
 
         switch (rarity)
         {
             case Rarity.Common:
-                minMultiplier = 1f;
-                maxMultiplier = 1.3f;  // Например, для Common от 1 до 1.2
+                multiplier = 1f;  // Множитель для Common
                 break;
             case Rarity.Rare:
-                minMultiplier = 1.4f;
-                maxMultiplier = 2f;  // Для Rare от 1.5 до 2
+                multiplier = 1.6f;  // Множитель для Rare
                 break;
             case Rarity.Epic:
-                minMultiplier = 2f;
-                maxMultiplier = 2.5f;  // Для Epic от 2 до 2.5
+                multiplier = 2.2f;  // Множитель для Epic
                 break;
             case Rarity.Mythic:
-                minMultiplier = 3f;
-                maxMultiplier = 4f;  // Для Epic от 2 до 2.5
+                multiplier = 3.5f;  // Множитель для Mythic
                 break;
             case Rarity.Legendary:
-                minMultiplier = 5f;
-                maxMultiplier = 8f;  // Для Legendary от 3 до 4
+                multiplier = 6f;  // Множитель для Legendary
                 break;
             default:
                 Debug.LogWarning($"Unknown rarity: {rarity}");
                 return 1f;
         }
 
-        // Генерация случайного множителя в пределах указанного диапазона
-        return Random.Range(minMultiplier, maxMultiplier);
+        return multiplier;
     }
 
 }

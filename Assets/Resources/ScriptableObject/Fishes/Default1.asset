@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0821ad82404249e4d9c09337dea648c1, type: 3}
+  m_Name: Default1
+  m_EditorClassIdentifier: 
+  ID: e32cef0c-7777-4a0d-ab42-7281bea6c710
+  Price: 100
+  Name: "\u041A\u0430\u043C\u0431\u0430\u043B\u0430"
+  Sprite: {fileID: 0}
+  rarity: 2
+  RarityColor: {r: 0.75, g: 0, b: 0.97, a: 1}
+  Prefab: {fileID: 129459724396852987, guid: 2f4f57620e8b31d44afbb93009e5af4a, type: 3}
+  Materials:
+  - {fileID: 2100000, guid: d96e4e2e2f6279e46936aa61ecedb340, type: 2}
+  - {fileID: 2100000, guid: 01defa9ac4f73d5409cd3d2febe6f0ac, type: 2}
+  - {fileID: 2100000, guid: e98f7032f5078884f804a99f39beb57b, type: 2}
+  - {fileID: 2100000, guid: c81638b3753872e499b7d86a071b6e32, type: 2}
+  - {fileID: 2100000, guid: fed5da7d598112846b2ef6bd2ab38a03, type: 2}
+  - {fileID: 2100000, guid: d3f56289d53da0747863e6419f9e0a90, type: 2}
+  - {fileID: 2100000, guid: a43c0f7d26d9d7a4487fa0e9c9175f17, type: 2}
+  - {fileID: 2100000, guid: 46f09d1ee0756704980ca0b4dfecb35b, type: 2}
+  - {fileID: 2100000, guid: ff0be7b3d8cb38141942f10ebe7e172d, type: 2}
+  - {fileID: 2100000, guid: 1397dbb8aaf49704a98ee06a0bf709ff, type: 2}
+  - {fileID: 2100000, guid: 2908e220fcdeedb40a8ab7ac424dfc1c, type: 2}
+  - {fileID: 2100000, guid: 1d5939a464acf6647805c9f9dbfaa20b, type: 2}
+  - {fileID: 2100000, guid: be1fb31c7813d794ca0bb3056f583534, type: 2}
+  - {fileID: 2100000, guid: 526718f8ee174804798ec72a5b8dc406, type: 2}
+  - {fileID: 2100000, guid: 157c47e0c183e304d98ecf181ace8326, type: 2}
+  - {fileID: 2100000, guid: 32f24be23d7e7a144a5ea612fcdc6d19, type: 2}
+  - {fileID: 2100000, guid: 80163557887c0fd4ba8ac2bbaee52a17, type: 2}
+  - {fileID: 2100000, guid: 216892814c5f0f84e9d1991a2a9842cb, type: 2}
+  - {fileID: 2100000, guid: 419d1c3909cea20449811fda629fb769, type: 2}
+  - {fileID: 2100000, guid: aaf7aa61a2604e0428b66a19f2c23901, type: 2}
+  - {fileID: 2100000, guid: 648a8630c958c0b49af39a9751448a70, type: 2}
+  - {fileID: 2100000, guid: fb4eff07285c4624aa470e9485820c5e, type: 2}
+  - {fileID: 2100000, guid: b16dbb8ed6255f14ab3b5ec7aa8690d9, type: 2}
+  - {fileID: 2100000, guid: ad34f47c4966ee647bce96892c9d4e5c, type: 2}
+  - {fileID: 2100000, guid: 5c57d49b51c144dd88e74e77943e1e02, type: 2}
+  - {fileID: 2100000, guid: 66941a833e21d47129ff94e45320325d, type: 2}
+  - {fileID: 2100000, guid: abc32a8102e2443479b8631391b25990, type: 2}
+  - {fileID: 2100000, guid: 6dcf759867bfc4ef0b52caed976f7996, type: 2}
+  - {fileID: 2100000, guid: 025cbf9d232c99f4bb5a2e86929f2cd7, type: 2}
+  RandomSize: 1.140596
+  RandomMaterial: {fileID: 2100000, guid: 80163557887c0fd4ba8ac2bbaee52a17, type: 2}
+  Experience: 125
+  SeaType: 0
+  BasePrice: 100

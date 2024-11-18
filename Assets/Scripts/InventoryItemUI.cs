@@ -30,8 +30,8 @@ public class InventoryItemUI : MonoBehaviour, IPointerEnterHandler, IPointerExit
 
             Tooltip.Show(
                 $"Имя: {fishData.Name} (<color=#{ColorUtility.ToHtmlStringRGB(fishData.RarityColor)}>{materialName}</color>)\n" +
-                $"Размер: {fishData.RandomSize:F2}\n" +
-                $"Базовая стоимость: {FishData.BasePrice} + {materialMultiplier:F2}x\n" +
+                $"размер: {fishData.RandomSize:F2}\n" +
+                $"Базовая стоимость: {fishData.BasePrice} + {materialMultiplier:F2}x\n" +
                 $"Стоимость: {CurrencyFormatter.FormatCurrency(fishData.Price)}\n" +
                 $"Опыт: {fishData.Experience}\n" +
                 $"Море: {fishData.SeaType}"

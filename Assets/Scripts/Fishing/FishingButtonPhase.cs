@@ -63,7 +63,7 @@ public class FishingButtonPhase : MonoBehaviour
         float delay = Random.Range(biteDelayMin, biteDelayMax);
         yield return new WaitForSeconds(delay);
 
-        feedbackText.text = "Рыба клюнула! Быстро нажмите на кнопку!";
+        feedbackText.text = "рыба клюнула! Быстро нажмите на кнопку!";
         ShowCatchButton();
     }
 
@@ -93,13 +93,13 @@ public class FishingButtonPhase : MonoBehaviour
     {
         yield return new WaitForSeconds(catchButtonTimeLimit);
 
-        feedbackText.text = "Вы не успели! Рыбалка окончена.";
+        feedbackText.text = "Вы не успели! рыбалка окончена.";
         catchButton.SetActive(false);
         EndPhase();
+        fishingManager.EndFishingProcess(false);
         yield return new WaitForSeconds(2f);
 
         feedbackText.gameObject.SetActive(false);
-        fishingManager.EndFishingProcess();
     }
 
     public void OnCatchButtonClick()

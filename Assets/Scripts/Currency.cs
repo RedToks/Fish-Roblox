@@ -9,8 +9,12 @@ public class Currency : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     [SerializeField] private TextMeshProUGUI currencyText;
 
+    private const string CurrencyKey = "PlayerCurrency"; // Ключ для валюты
+
     private void Start()
     {
+        // Загружаем валюту при старте
+        LoadCurrencyData();
         UpdateCurrencyDisplay();
     }
 
@@ -24,6 +28,8 @@ public class Currency : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         if (CanAfford(amount))
         {
             CurrentCurrency -= amount;
+            // Сохраняем данные о валюте после траты
+            SaveCurrencyData();
             UpdateCurrencyDisplay();
         }
         else
@@ -37,6 +43,8 @@ public class Currency : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         CurrentCurrency += amount;
         Debug.Log($"Получено {amount} валюты. Текущий баланс: {CurrentCurrency}");
 
+        // Сохраняем данные о валюте после добавления
+        SaveCurrencyData();
         UpdateCurrencyDisplay();
     }
 
@@ -46,6 +54,26 @@ public class Currency : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         {
             string formattedCurrency = CurrencyFormatter.FormatCurrency(CurrentCurrency);
             currencyText.text = $"{formattedCurrency}";
+        }
+    }
+
+    private void SaveCurrencyData()
+    {
+        // Сохраняем валюту в PlayerPrefs
+        PlayerPrefs.SetInt(CurrencyKey, CurrentCurrency);
+        PlayerPrefs.Save();
+    }
+
+    private void LoadCurrencyData()
+    {
+        // Загружаем валюту из PlayerPrefs, если она существует
+        if (PlayerPrefs.HasKey(CurrencyKey))
+        {
+            CurrentCurrency = PlayerPrefs.GetInt(CurrencyKey);
+        }
+        else
+        {
+            CurrentCurrency = 0; // Если данных нет, начинаем с 0
         }
     }
 

@@ -13,8 +13,14 @@ public class PlayerExperience : MonoBehaviour
     private int currentExperience = 0;
     private int experienceToNextLevel = 100;
 
+    private const string LevelKey = "PlayerLevel";  // Ключ для уровня игрока
+    private const string ExperienceKey = "PlayerExperience";  // Ключ для опыта игрока
+    private const string ExperienceToNextLevelKey = "PlayerExperienceToNextLevel";  // Ключ для опыта до следующего уровня
+
     private void Start()
     {
+        // Загружаем данные о уровне и опыте при старте
+        LoadPlayerData();
         UpdateUI();
     }
 
@@ -22,6 +28,7 @@ public class PlayerExperience : MonoBehaviour
     {
         currentExperience += amount;
 
+        // Проверка, если опыт больше, чем нужно для следующего уровня
         while (currentExperience >= experienceToNextLevel && currentLevel < maxLevel)
         {
             currentExperience -= experienceToNextLevel;
@@ -29,12 +36,14 @@ public class PlayerExperience : MonoBehaviour
             experienceToNextLevel = CalculateExperienceToNextLevel(currentLevel);
         }
 
+        // Сохраняем данные о уровне, опыте и опыте до следующего уровня
+        SavePlayerData();
         UpdateUI();
     }
 
     private int CalculateExperienceToNextLevel(int level)
     {
-        return level * 1000;
+        return level * 100; // Пример: для 1 уровня требуется 100 опыта, для 2 уровня 200 и так далее.
     }
 
     private void UpdateUI()
@@ -51,7 +60,42 @@ public class PlayerExperience : MonoBehaviour
             levelText.text = $"Уровень {currentLevel}";
 
             int experienceNeeded = experienceToNextLevel - currentExperience;
-            experienceToNextLevelText.text = $"До следующего уровня: {CurrencyFormatter.FormatCurrency(experienceNeeded)} опыта";
+            experienceToNextLevelText.text = $"До след. уровня: {CurrencyFormatter.FormatCurrency(experienceNeeded)} опыта";
+        }
+    }
+
+    private void SavePlayerData()
+    {
+        // Сохраняем уровень, опыт и опыт до следующего уровня в PlayerPrefs
+        PlayerPrefs.SetInt(LevelKey, currentLevel);
+        PlayerPrefs.SetInt(ExperienceKey, currentExperience);
+        PlayerPrefs.SetInt(ExperienceToNextLevelKey, experienceToNextLevel);
+        PlayerPrefs.Save();
+    }
+
+    private void LoadPlayerData()
+    {
+        // Загружаем уровень, опыт и опыт до следующего уровня из PlayerPrefs, если они существуют
+        if (PlayerPrefs.HasKey(LevelKey) && PlayerPrefs.HasKey(ExperienceKey) && PlayerPrefs.HasKey(ExperienceToNextLevelKey))
+        {
+            currentLevel = PlayerPrefs.GetInt(LevelKey);
+            currentExperience = PlayerPrefs.GetInt(ExperienceKey);
+            experienceToNextLevel = PlayerPrefs.GetInt(ExperienceToNextLevelKey);
+
+            // Проверка на возможное несоответствие опыта и уровня
+            while (currentExperience >= experienceToNextLevel && currentLevel < maxLevel)
+            {
+                currentExperience -= experienceToNextLevel;
+                currentLevel++;
+                experienceToNextLevel = CalculateExperienceToNextLevel(currentLevel);
+            }
+        }
+        else
+        {
+            // Если данных нет, начинаем с нулевого уровня и опыта
+            currentLevel = 1;
+            currentExperience = 0;
+            experienceToNextLevel = CalculateExperienceToNextLevel(currentLevel);
         }
     }
 }

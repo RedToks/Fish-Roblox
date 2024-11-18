@@ -1,8 +1,42 @@
+using System.Collections;
 using UnityEngine;
 
 public class FishObject : MonoBehaviour
 {
     public FishData fishData;
+    private Coroutine destroyCoroutine;
+    private const float timeBeforeDestruction = 30f; // Время до удаления рыбы (30 секунд)
+
+    private void Start()
+    {
+        // Запускаем Coroutine для отслеживания времени жизни рыбы
+        destroyCoroutine = StartCoroutine(DestroyAfterTime());
+    }
+
+    private IEnumerator DestroyAfterTime()
+    {
+        float remainingTime = timeBeforeDestruction;
+
+        while (remainingTime > 0)
+        {
+            Debug.Log($"Осталось времени: {remainingTime:F1} секунд");
+            remainingTime -= 1f;  // Уменьшаем время на 1 секунду
+            yield return new WaitForSeconds(1f);  // Ждем 1 секунду
+        }
+
+        // Если инвентарь не заполнен, рыба будет забрана
+        if (Inventory.instance.IsFull())
+        {
+            Debug.Log("Инвентарь полон, рыба не может быть забрана.");
+        }
+        else
+        {
+            Debug.Log("Рыба забрана игроком.");
+            // Добавьте логику добавления рыбы в инвентарь здесь (например, вызов метода для добавления рыбы в инвентарь)
+            // Inventory.instance.AddFishItem(fishData, gameObject);
+            Destroy(gameObject); // Удаляем рыбу из сцены
+        }
+    }
 
     public void InitializeFish(FishData fishData)
     {
@@ -12,54 +46,55 @@ public class FishObject : MonoBehaviour
             return;
         }
 
-
         this.fishData = fishData;
-        ApplyFishData();
-    }
 
-    private void ApplyFishData()
-    {
-        if (fishData != null)
+        // Устанавливаем параметры на основе уже существующих данных
+        float size = fishData.RandomSize;
+        transform.localScale = new Vector3(size, size, size);
+
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb != null)
         {
-            // Устанавливаем размер рыбы
-            float size = fishData.RandomSize;
-            transform.localScale = new Vector3(size, size, size);
+            rb.mass = size * size * size;
+            rb.useGravity = true;
+            rb.isKinematic = false;
+            rb.drag = 3f;
+            rb.angularDrag = 3f;
+        }
 
-            // Устанавливаем массу рыбы (масса пропорциональна объему)
-            Rigidbody rb = GetComponent<Rigidbody>();
-            if (rb != null)
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
+        {
+            if (fishData.RandomMaterial != null)
             {
-                // Объем рыбы можно приблизительно посчитать как куб её размера
-                rb.mass = size * size * size;  // Пропорционально объему
-
-                // Настройки физики для предотвращения толкания
-                rb.useGravity = true; // Чтобы рыба не взлетала
-                rb.isKinematic = false; // Не отключаем кинематику
-
-                // Увеличиваем сопротивление
-                rb.drag = 3f;  // Сопротивление воздуха
-                rb.angularDrag = 3f;  // Сопротивление вращению
+                renderer.material = fishData.RandomMaterial;
             }
-
-            // Устанавливаем материалы
-            Renderer[] renderers = GetComponentsInChildren<Renderer>();
-            if (renderers.Length == 0)
+            else
             {
-                Debug.LogWarning("No renderers found on fish object!");
-            }
-
-            foreach (Renderer renderer in renderers)
-            {
-                if (fishData.RandomMaterial != null)
-                {
-                    Debug.Log("Applying material: " + fishData.RandomMaterial.name);
-                    renderer.material = fishData.RandomMaterial;
-                }
-                else
-                {
-                    Debug.LogWarning("RandomMaterial is null!");
-                }
+                Debug.LogWarning("RandomMaterial is null!");
             }
         }
+    }
+
+    public void TryPickUpFish()
+    {
+        // Если инвентарь полный, рыба не может быть забрана
+        if (Inventory.instance.IsFull())
+        {
+            Debug.Log("Инвентарь полный, рыба не может быть забрана.");
+            return; // Выход из метода, не забирая рыбу
+        }
+
+        // Если инвентарь не полный, пытаемся забрать рыбу
+        if (destroyCoroutine != null)
+        {
+            StopCoroutine(destroyCoroutine);
+            destroyCoroutine = null;
+        }
+
+        // Здесь можно добавить логику для добавления рыбы в инвентарь
+        Inventory.instance.AddFishItem(fishData, gameObject);
+        Debug.Log("Рыба забрана игроком.");
+        Destroy(gameObject); // Удаляем рыбу из сцены, если она забрана
     }
 }

@@ -8,40 +8,69 @@ public class Game : MonoBehaviour
     [SerializeField] private List<FishData> secondSeaFish; // Fish for the Second Sea
     [SerializeField] private List<FishData> thirdSeaFish;  // Fish for the Third Sea
 
-    [SerializeField] private FishData fishPrefabData; // Префаб рыбы для создания новых экземпляров
     private InventoryUI inventoryUI;
 
-    // Метод для создания рыбы и добавления её в список
     public void Start()
     {
         inventoryUI = FindObjectOfType<InventoryUI>();
-        AddFishToSeas();
     }
-    private FishData CreateFishData(SeaType seaType)
-    {
-        // Создаем рыбу с базовыми параметрами
-        return new FishData(
-            fishPrefabData.Prefab,
-            fishPrefabData.Name,
-            fishPrefabData.Sprite,
-            seaType
-        );
-    }
+
     public void AddFishButton()
     {
-        FishData caughtFish = CreateFishFromSea(SeaType.First);
+        // Replace with actual sea type logic
+        SeaType currentSeaType = SeaType.Стандартное;
+
+        FishData caughtFish = CreateFishFromSea(currentSeaType);
         if (caughtFish != null)
         {
-            // Создаем 3D объект рыбы для иконки
             GameObject fishModel = Instantiate(caughtFish.Prefab, Vector3.zero, Quaternion.identity);
-            fishModel.SetActive(false); // Делаем его невидимым
+            fishModel.SetActive(false);
 
-            // Добавляем рыбу и её модель в инвентарь
             Inventory.instance.AddFishItem(caughtFish, fishModel);
             inventoryUI.UpdateInventoryUI();
         }
     }
-    // Метод для инициализации параметров рыбы
+
+    private FishData GetRandomFishFromSea(SeaType seaType)
+    {
+        List<FishData> selectedSeaFish = null;
+
+        switch (seaType)
+        {
+            case SeaType.Стандартное:
+                selectedSeaFish = firstSeaFish;
+                break;
+            case SeaType.Ледовитое:
+                selectedSeaFish = secondSeaFish;
+                break;
+            case SeaType.Лавовое:
+                selectedSeaFish = thirdSeaFish;
+                break;
+        }
+
+        if (selectedSeaFish == null || selectedSeaFish.Count == 0)
+        {
+            Debug.LogWarning($"No fish available for {seaType}!");
+            return null;
+        }
+
+        // Return a random fish from the selected list
+        return selectedSeaFish[Random.Range(0, selectedSeaFish.Count)];
+    }
+
+    public FishData CreateFishFromSea(SeaType seaType)
+    {
+        FishData baseFish = GetRandomFishFromSea(seaType);
+        if (baseFish == null) return null;
+
+        // Create a new instance based on the selected fish
+        FishData newFish = Instantiate(baseFish);
+
+        InitializeFishData(newFish);
+
+        return newFish;
+    }
+
     private void InitializeFishData(FishData fishData)
     {
         fishData.Materials = fishData.LoadMaterialsByCategory();
@@ -50,47 +79,4 @@ public class Game : MonoBehaviour
         fishData.Price = fishData.CalculatePrice();
         fishData.Experience = fishData.Price / 2;
     }
-
-    // Метод для добавления рыбы в соответствующий список моря
-    private void AddFishToSeaList(FishData fishData, SeaType seaType)
-    {
-        switch (seaType)
-        {
-            case SeaType.First:
-                firstSeaFish.Add(fishData);
-                break;
-            case SeaType.Second:
-                secondSeaFish.Add(fishData);
-                break;
-            case SeaType.Third:
-                thirdSeaFish.Add(fishData);
-                break;
-        }
-    }
-
-    // Метод для создания рыбы для определенного моря
-    public FishData CreateFishFromSea(SeaType seaType)
-    {
-        // Создаем рыбу с базовыми данными для указанного моря
-        FishData newFish = CreateFishData(seaType);
-
-        // Инициализируем рыбу (материалы, размер, цена и т.д.)
-        InitializeFishData(newFish);
-
-        // Добавляем рыбу в список для соответствующего моря
-        AddFishToSeaList(newFish, seaType);
-
-        // Возвращаем созданную рыбу
-        return newFish;
-    }
-
-    // Метод для добавления рыбы во все моря (пример использования)
-    private void AddFishToSeas()
-    {
-        // Создаем и добавляем рыбу для каждого моря
-        CreateFishFromSea(SeaType.First);
-        CreateFishFromSea(SeaType.Second);
-        CreateFishFromSea(SeaType.Third);
-    }
-
 }
