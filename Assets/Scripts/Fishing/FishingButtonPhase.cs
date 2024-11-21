@@ -16,8 +16,7 @@ public class FishingButtonPhase : MonoBehaviour
     [SerializeField] private int maxCatchAttempts = 10;
     [SerializeField] private float newButtonDelay = 1;
 
-    [Header("Fishing Areas")]
-    [SerializeField] private FishingAreaTrigger fishingAreaTriggers;
+    [SerializeField] private AudioSource buttonClickSound;
 
     private int currentClicks;
     private int targetClicks;
@@ -104,6 +103,8 @@ public class FishingButtonPhase : MonoBehaviour
 
     public void OnCatchButtonClick()
     {
+        buttonClickSound.Play();
+
         currentClicks++;
 
         if (catchButtonTimer != null)

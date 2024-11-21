@@ -9,7 +9,7 @@ public class PlayerExperience : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelText;
     [SerializeField] private TextMeshProUGUI experienceToNextLevelText;
 
-    private int currentLevel = 1;
+    public int currentLevel { get; private set; } = 1;
     private int currentExperience = 0;
     private int experienceToNextLevel = 100;
 
@@ -50,14 +50,14 @@ public class PlayerExperience : MonoBehaviour
     {
         if (currentLevel >= maxLevel)
         {
-            levelText.text = $"Уровень {maxLevel}";
+            levelText.text = $"уровень {maxLevel}";
             experienceToNextLevelText.text = "Вы достигли максимального уровня";
             experienceSlider.value = experienceSlider.maxValue;
         }
         else
         {
             experienceSlider.value = (float)currentExperience / experienceToNextLevel;
-            levelText.text = $"Уровень {currentLevel}";
+            levelText.text = $"уровень {currentLevel}";
 
             int experienceNeeded = experienceToNextLevel - currentExperience;
             experienceToNextLevelText.text = $"До след. уровня: {CurrencyFormatter.FormatCurrency(experienceNeeded)} опыта";

@@ -243,35 +243,46 @@ public class Shop : MonoBehaviour
             return;
         }
 
-        // Проверка, является ли предмет удочкой
         if (item is FishingRodData rod)
         {
-            itemToSell = item;
-            itemButton = button;
-
             FishingRodData upgradedRod = GetUpgradedRod(rod);
-            if (upgradedRod != null)
-            {
-                // Проверка на достаточность валюты для улучшения
-                if (playerCurrency.CanAfford(upgradedRod.Price))
-                {
-                    confirmText.text = $"Вы уверены, что хотите улучшить свою удочку до уровня {upgradedRod.Level} за {CurrencyFormatter.FormatCurrency(upgradedRod.Price)}?";
-                    yesButton.interactable = true;  // Активируем кнопку
-                    yesButton.onClick.RemoveAllListeners();
-                    yesButton.onClick.AddListener(() => UpgradeFishingRod(rod));
-                }
-                else
-                {
-                    confirmText.text = $"Недостаточно средств для улучшения удочки до уровня {upgradedRod.Level}.";
-                    yesButton.interactable = false;  // Деактивируем кнопку
-                }
 
-                confirmPanel.SetActive(true);
-            }
-            else
+            if (upgradedRod == null)
             {
                 Debug.LogWarning("Удочка следующего уровня не найдена.");
+                confirmText.text = "Удочка следующего уровня не найдена.";
+                yesButton.interactable = false;
+                confirmPanel.SetActive(true);
+                return;
             }
+
+            int requiredLevel = upgradedRod.Level == 2 ? 10 : (upgradedRod.Level == 3 ? 25 : 0);
+            string errorMessage = "";
+
+            if (playerExperience.currentLevel < requiredLevel)
+            {
+                errorMessage += $"Недостаточно уровня для улучшения удочки до {upgradedRod.Level} уровня.\nТребуется уровень: {requiredLevel}, ваш уровень: {playerExperience.currentLevel}.\n\n";  // Отступ после уровня
+            }
+
+            if (!playerCurrency.CanAfford(upgradedRod.Price))
+            {
+                errorMessage += $"Недостаточно средств для улучшения удочки до {upgradedRod.Level} уровня.\nТребуется: {CurrencyFormatter.FormatCurrency(upgradedRod.Price)}, у вас: {CurrencyFormatter.FormatCurrency(playerCurrency.CurrentCurrency)}.";
+            }
+
+            if (!string.IsNullOrEmpty(errorMessage))
+            {
+                confirmText.text = errorMessage;
+                yesButton.interactable = false;
+                confirmPanel.SetActive(true);
+                return;
+            }
+
+            // Если все проверки пройдены, отображаем подтверждение
+            confirmText.text = $"Вы уверены, что хотите улучшить свою удочку до уровня {upgradedRod.Level} за {CurrencyFormatter.FormatCurrency(upgradedRod.Price)}?";
+            yesButton.interactable = true;
+            yesButton.onClick.RemoveAllListeners();
+            yesButton.onClick.AddListener(() => UpgradeFishingRod(rod));
+            confirmPanel.SetActive(true);
         }
         else
         {
@@ -279,40 +290,25 @@ public class Shop : MonoBehaviour
         }
     }
 
+
+
+
     private void UpgradeFishingRod(FishingRodData currentRod)
     {
-        // Получаем удочку следующего уровня
         FishingRodData upgradedRod = GetUpgradedRod(currentRod);
 
-        // Если удочка следующего уровня существует
         if (upgradedRod != null)
         {
-            // Проверка, есть ли у игрока достаточно средств для улучшения
-            if (playerCurrency.CanAfford(upgradedRod.Price)) // Снимаем средства за удочку следующего уровня
-            {
-                // Спускаем валюту
-                playerCurrency.SpendCurrency(upgradedRod.Price);
+            playerCurrency.SpendCurrency(upgradedRod.Price);
+            Inventory.instance.ReplaceItemInInventory(upgradedRod);
+            inventoryUI.UpdateInventoryUI();
 
-                // Заменяем старую удочку на новую
-                Inventory.instance.ReplaceItemInInventory(upgradedRod);
-
-                // Обновляем UI
-                inventoryUI.UpdateInventoryUI();
-                Debug.Log($"Удочка улучшена до уровня {upgradedRod.Level}");
-
-                confirmPanel.SetActive(false);
-                currentAction = ShopAction.None;
-            }
-            else
-            {
-                Debug.LogWarning("Недостаточно валюты для улучшения удочки.");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Удочка следующего уровня не найдена.");
+            Debug.Log($"Удочка улучшена до уровня {upgradedRod.Level}");
+            confirmPanel.SetActive(false);
+            currentAction = ShopAction.None;
         }
     }
+
 
     public FishingRodData GetUpgradedRod(FishingRodData currentRod)
     {

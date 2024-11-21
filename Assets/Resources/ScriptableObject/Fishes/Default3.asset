@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0821ad82404249e4d9c09337dea648c1, type: 3}
   m_Name: Default3
   m_EditorClassIdentifier: 
-  ID: 535ace54-ae53-4682-9bd3-612d38c55dfa
   Price: 100
   Name: "\u041A\u0430\u0440\u043F"
   Sprite: {fileID: 0}
@@ -53,4 +52,5 @@ MonoBehaviour:
   RandomMaterial: {fileID: 2100000, guid: 46f09d1ee0756704980ca0b4dfecb35b, type: 2}
   Experience: 158
   SeaType: 0
-  BasePrice: 130
+  SpritePath: 
+  BasePrice: 175

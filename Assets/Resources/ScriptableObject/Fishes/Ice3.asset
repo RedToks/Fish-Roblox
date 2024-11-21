@@ -23,4 +23,5 @@ MonoBehaviour:
   RandomMaterial: {fileID: 0}
   Experience: 0
   SeaType: 1
-  BasePrice: 400
+  SpritePath: 
+  BasePrice: 450

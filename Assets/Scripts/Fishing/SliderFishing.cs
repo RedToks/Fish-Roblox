@@ -28,6 +28,8 @@ public class SliderFishing : MonoBehaviour
     private float greenZonePositionX = 0f;
     private bool isMovingRight = true;
 
+    [SerializeField] private AudioSource phaseMusic;
+
     private bool isSliderActive = false;
     private int direction = 0; // -1: влево, 1: вправо, 0: остановка
     private RectTransform greenZoneRect;
@@ -45,12 +47,15 @@ public class SliderFishing : MonoBehaviour
 
     public void StartPhase()
     {
+
         isSliderActive = true;
         slider.gameObject.SetActive(true);
         fishingProgressSlider.gameObject.SetActive(true);
         feedbackText.text = "Удерживайте слайдер в зоне!";
         feedbackCanvasGroup.alpha = 1f;
         fishingProgressSlider.value = 0.5f;
+
+        phaseMusic.Play();
     }
 
     private void Update()
@@ -80,6 +85,7 @@ public class SliderFishing : MonoBehaviour
                 StartCoroutine(FadeOutText());
                 EndFishing();
                 fishingManager.EndFishingProcess(true);
+                phaseMusic.Stop();
             }
             else if (fishingProgressSlider.value <= 0f)
             {
@@ -87,6 +93,7 @@ public class SliderFishing : MonoBehaviour
                 StartCoroutine(FadeOutText());
                 EndFishing();
                 fishingManager.EndFishingProcess(false);
+                phaseMusic.Stop();
             }
         }
     }

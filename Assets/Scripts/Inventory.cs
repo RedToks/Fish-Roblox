@@ -8,6 +8,7 @@ public class Inventory : MonoBehaviour
     public List<ItemData> items = new List<ItemData>();
     private int maxInventorySize = 6;
     [SerializeField] private FishingRodData firstFishingRod;
+    [SerializeField] private FishingRodData[] allFishingRods;
     private InventoryUI inventoryUI;
 
     // Переменная для отслеживания уровня удочки
@@ -29,10 +30,20 @@ public class Inventory : MonoBehaviour
     private void Start()
     {
         inventoryUI = FindObjectOfType<InventoryUI>();
+        LoadFishingRodLevel();
         inventoryUI.UpdateInventoryUI();
-        if (items.Count == 0)
+        if (items.Count == 0 && RodLvl == 1)
         {
             AddInitialItem(firstFishingRod);
+        }
+        else
+        {
+            // Убеждаемся, что удочка соответствует загруженному уровню
+            var loadedRod = GetRodByLevel(RodLvl);
+            if (loadedRod != null && !items.Contains(loadedRod))
+            {
+                ReplaceItemInInventory(loadedRod);
+            }
         }
     }
     private void AddInitialItem(FishingRodData item)
@@ -70,8 +81,55 @@ public class Inventory : MonoBehaviour
             items[index] = newItem;
             inventoryUI.UpdateInventoryUI();
 
-            // Устанавливаем уровень удочки, если она заменена
-            SetFishingRodLevel(newItem as FishingRodData);
+            SaveFishingRodLevel((newItem as FishingRodData)?.Level ?? 1);
+        }
+    }
+    private FishingRodData GetRodByLevel(int level)
+    {
+        foreach (var rod in allFishingRods)
+        {
+            if (rod.Level == level)
+            {
+                return rod;
+            }
+        }
+        return null; // Если удочка не найдена
+    }
+    private void SaveFishingRodLevel(int level)
+    {
+        RodLvl = level;
+        PlayerPrefs.SetInt("RodLvl", RodLvl);
+        PlayerPrefs.Save();
+        Debug.Log($"Уровень удочки сохранен: {RodLvl}");
+    }
+    private void LoadFishingRodLevel()
+    {
+        RodLvl = PlayerPrefs.GetInt("RodLvl", 1); // По умолчанию - 1 уровень
+        Debug.Log($"Уровень удочки загружен: {RodLvl}");
+
+        // Находим удочку соответствующего уровня
+        var loadedRod = GetRodByLevel(RodLvl);
+
+        if (loadedRod != null)
+        {
+            // Если удочки текущего уровня нет в инвентаре, добавляем ее
+            if (!items.Contains(loadedRod))
+            {
+                if (IsFull())
+                {
+                    Debug.LogWarning("Инвентарь полон. Удочка не может быть добавлена.");
+                }
+                else
+                {
+                    items.Add(loadedRod);
+                    Debug.Log($"Удочка уровня {RodLvl} добавлена в инвентарь.");
+                    inventoryUI.UpdateInventoryUI();
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError($"Удочка уровня {RodLvl} не найдена в списке всех удочек.");
         }
     }
 

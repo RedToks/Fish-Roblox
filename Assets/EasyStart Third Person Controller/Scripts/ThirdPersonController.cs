@@ -1,11 +1,5 @@
-﻿using UnityEditor.VersionControl;
-using UnityEngine;
+﻿using UnityEngine;
 
-/// <summary>
-/// Main script for third-person movement of the character in the game.
-/// Make sure that the object that will receive this script (the player) 
-/// has the Player tag and the Character Controller component.
-/// </summary>
 public class ThirdPersonController : MonoBehaviour
 {
     [Tooltip("Speed ​​at which the character moves. It is not affected by gravity or jumping.")]

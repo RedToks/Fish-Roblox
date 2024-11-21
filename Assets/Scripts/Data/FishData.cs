@@ -164,26 +164,26 @@ public class FishData : ItemData
     {
         if (material == null) return;
 
-        // Извлекаем путь, по которому был загружен материал
-        string materialPath = AssetDatabase.GetAssetPath(material);
-
         // Получаем уровень удочки
         int rodLevel = Inventory.instance.RodLvl;
 
-        // Определяем редкость рыбы в зависимости от материала и уровня удочки
-        if (rodLevel >= 3 && materialPath.Contains($"/Materials/{SeaType.ToString()}/Legendary/"))
+        // Задаем базовый путь к папке Resources/Materials
+        string basePath = $"Materials/{SeaType.ToString()}";
+
+        // Определяем редкость на основе папки, в которой находится материал
+        if (rodLevel >= 3 && IsMaterialInFolder(material, $"{basePath}/Legendary"))
         {
             rarity = Rarity.Legendary;
         }
-        else if (rodLevel >= 2 && materialPath.Contains($"/Materials/{SeaType.ToString()}/Mythic/"))
+        else if (rodLevel >= 2 && IsMaterialInFolder(material, $"{basePath}/Mythic"))
         {
             rarity = Rarity.Mythic;
         }
-        else if (materialPath.Contains($"/Materials/{SeaType.ToString()}/Epic/"))
+        else if (IsMaterialInFolder(material, $"{basePath}/Epic"))
         {
             rarity = Rarity.Epic;
         }
-        else if (materialPath.Contains($"/Materials/{SeaType.ToString()}/Rare/"))
+        else if (IsMaterialInFolder(material, $"{basePath}/Rare"))
         {
             rarity = Rarity.Rare;
         }
@@ -192,12 +192,18 @@ public class FishData : ItemData
             rarity = Rarity.Common;
         }
 
+        // Устанавливаем цвет редкости
         RarityColor = GetRarityColor();
     }
 
+    private bool IsMaterialInFolder(Material material, string folderPath)
+    {
+        // Загружаем все материалы в указанной папке
+        Material[] materialsInFolder = Resources.LoadAll<Material>(folderPath);
 
-
-
+        // Проверяем, содержится ли данный материал в списке загруженных
+        return materialsInFolder != null && System.Array.Exists(materialsInFolder, m => m == material);
+    }
 
     // Метод для выбора случайного размера с учетом вероятности
     public float GetRandomSize()
