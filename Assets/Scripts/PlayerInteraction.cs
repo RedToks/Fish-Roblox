@@ -10,7 +10,7 @@ public class PlayerInteraction : MonoBehaviour
     private GameObject fishObject;  // Объект рыбы, с которой взаимодействует игрок
     private bool isNearFish = false;  // Переменная для проверки, находится ли игрок рядом с рыбой
 
-    private FishingAreaTrigger currentFishingArea;
+    public FishingAreaTrigger currentFishingArea { get; private set; }
 
     void Update()
     {

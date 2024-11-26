@@ -39,7 +39,7 @@ public class TeleportToLocations : MonoBehaviour
     private void Update()
     {
         // ѕровер€ем, что игрок находитс€ в зоне и нажал G, а также не рыбачит
-        if (playerInZone && (Input.GetKeyDown(KeyCode.G) || Input.GetKeyDown(KeyCode.E) || Input.GetKeyDown(KeyCode.F))  && CanTeleport())
+        if (playerInZone && (Input.GetKeyDown(KeyCode.G) || Input.GetKeyDown(KeyCode.E)) && CanTeleport())
         {
             TeleportPlayer();
         }
@@ -68,6 +68,13 @@ public class TeleportToLocations : MonoBehaviour
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
+            // —брасываем рыболовную зону перед телепортацией
+            var playerInteraction = player.GetComponent<PlayerInteraction>();
+            if (playerInteraction != null && playerInteraction.currentFishingArea != null)
+            {
+                playerInteraction.currentFishingArea.ResetFishingArea(playerInteraction);
+            }
+
             player.transform.position = targetZone.position;
             Debug.Log("Player teleported to " + targetZone.position);
         }

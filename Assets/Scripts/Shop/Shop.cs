@@ -1,6 +1,7 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using YG;
 
 public class Shop : MonoBehaviour
 {
@@ -31,6 +32,7 @@ public class Shop : MonoBehaviour
     private PlayerExperience playerExperience;
     private PlayerInteraction playerInteraction;
     private InventoryUI inventoryUI;
+    private YandexGame yandexGame;
 
     // Платформы с телепортами для островов
     [SerializeField] private GameObject iceIslandTeleportPlatform;
@@ -54,6 +56,7 @@ public class Shop : MonoBehaviour
 
     private void Start()
     {
+        yandexGame = FindObjectOfType<YandexGame>();
         inventoryUI = FindObjectOfType<InventoryUI>();
         playerExperience = FindObjectOfType<PlayerExperience>();
         playerInteraction = FindObjectOfType<PlayerInteraction>();
@@ -370,6 +373,7 @@ public class Shop : MonoBehaviour
             button.gameObject.SetActive(false);
             confirmPanel.SetActive(false);
             currentAction = ShopAction.None; // Сброс флага после завершения действия
+            yandexGame._FullscreenShow();
         }
     }
 }

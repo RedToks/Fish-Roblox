@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
+using TMPro;
 
 public class Settings : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class Settings : MonoBehaviour
     [SerializeField] private GameObject resetConfirmationPanel; // Панель подтверждения
     [SerializeField] private Button confirmResetButton; // Кнопка подтверждения сброса
     [SerializeField] private Button cancelResetButton; // Кнопка отмены сброса
+    [SerializeField] private TMP_Dropdown qualityDropdown;
 
     private GameSettings currentSettings;
     private SaveLoad saveLoad;
@@ -27,15 +29,48 @@ public class Settings : MonoBehaviour
         currentSettings = saveLoad.LoadSettings();
         if (currentSettings == null)
         {
+            Debug.LogWarning("No saved settings found. Using default settings.");
             currentSettings = new GameSettings();
         }
 
-        audioMixer.SetFloat("volume", currentSettings.volume);
-        volumeSlider.value = currentSettings.volume;
+        // Логируем загруженные настройки
+        Debug.Log($"Loaded Settings: Volume={currentSettings.volume}, Sensitivity={currentSettings.sensitivity}, QualityLevel={currentSettings.qualityLevel}");
 
-        sensitivitySlider.value = currentSettings.sensitivity;
-        sensitivitySlider.onValueChanged.AddListener(SetSensitivity);
+        // Применяем настройки громкости
+        if (audioMixer != null)
+        {
+            audioMixer.SetFloat("volume", currentSettings.volume);
+            Debug.Log($"Audio volume set to {currentSettings.volume}");
+        }
 
+        if (volumeSlider != null)
+        {
+            volumeSlider.value = currentSettings.volume;
+        }
+
+        // Применяем чувствительность
+        if (sensitivitySlider != null)
+        {
+            sensitivitySlider.value = currentSettings.sensitivity;
+            sensitivitySlider.onValueChanged.AddListener(SetSensitivity);
+        }
+
+        // Применяем уровень качества
+        if (qualityDropdown != null)
+        {
+            Debug.Log($"Applying quality level: {currentSettings.qualityLevel}");
+            QualitySettings.SetQualityLevel(currentSettings.qualityLevel); // Применяем уровень качества
+            qualityDropdown.value = currentSettings.qualityLevel;         // Обновляем Dropdown
+            qualityDropdown.RefreshShownValue();                          // Принудительное обновление отображения
+            qualityDropdown.onValueChanged.AddListener(SetQuality);
+            Debug.Log($"Dropdown updated to value: {qualityDropdown.value}");
+        }
+        else
+        {
+            Debug.LogError("Quality dropdown is not assigned.");
+        }
+
+        // Настройка кнопок сброса
         if (resetButton != null)
         {
             resetButton.onClick.AddListener(ShowResetConfirmation);
@@ -54,13 +89,19 @@ public class Settings : MonoBehaviour
 
     public void SetVolume(float volume)
     {
-        audioMixer.SetFloat("volume", volume);
+        if (audioMixer != null)
+        {
+            audioMixer.SetFloat("volume", volume);
+            Debug.Log($"Volume changed to {volume}");
+        }
+
         currentSettings.volume = volume;
         saveLoad.SaveSettings(currentSettings);
     }
 
     public void SetSensitivity(float sensitivity)
     {
+        Debug.Log($"Sensitivity changed to {sensitivity}");
         currentSettings.sensitivity = sensitivity;
         saveLoad.SaveSettings(currentSettings);
 
@@ -73,23 +114,9 @@ public class Settings : MonoBehaviour
 
     public void SetQuality(int qualityIndex)
     {
+        Debug.Log($"Quality level changed to {qualityIndex}");
         QualitySettings.SetQualityLevel(qualityIndex);
         currentSettings.qualityLevel = qualityIndex;
-        saveLoad.SaveSettings(currentSettings);
-    }
-
-    public void SetResolution(int width, int height)
-    {
-        Screen.SetResolution(width, height, currentSettings.isFullScreen);
-        currentSettings.resolutionWidth = width;
-        currentSettings.resolutionHeight = height;
-        saveLoad.SaveSettings(currentSettings);
-    }
-
-    public void SetFullScreen(bool isFullScreen)
-    {
-        Screen.fullScreen = isFullScreen;
-        currentSettings.isFullScreen = isFullScreen;
         saveLoad.SaveSettings(currentSettings);
     }
 
@@ -105,7 +132,7 @@ public class Settings : MonoBehaviour
 
     public void ResetSettings()
     {
-        // Удаляем все PlayerPrefs
+        Debug.Log("Resetting settings to default.");
         PlayerPrefs.DeleteAll();
         PlayerPrefs.Save();
         resetConfirmationPanel.SetActive(false);

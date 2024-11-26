@@ -86,26 +86,38 @@ public class FishingManager : MonoBehaviour
     }
 
     // Метод для завершения рыбалки
+    // Метод для завершения рыбалки
     public void EndFishingProcess(bool isFishCaught)
     {
         if (!isFishingActive) return;
 
         if (isFishCaught)
         {
-            // Здесь создаем рыбу, если она была поймана
-            FishData caughtFish = game.CreateFishFromSea(currentSeaType);
-            if (caughtFish != null)
+            // Проверяем, можно ли добавить рыбу в инвентарь
+            if (Inventory.instance.IsFull())
             {
-                GameObject fishModel = Instantiate(caughtFish.Prefab, Vector3.zero, Quaternion.identity);
-                fishModel.SetActive(false);
+                feedbackText.text = "Инвентарь полон, невозможно добавить рыбу!";
+                Debug.Log("Инвентарь полон, невозможно добавить рыбу.");
+            }
+            else
+            {
+                // Создаем рыбу, если инвентарь не полон
+                FishData caughtFish = game.CreateFishFromSea(currentSeaType);
+                if (caughtFish != null)
+                {
+                    GameObject fishModel = Instantiate(caughtFish.Prefab, Vector3.zero, Quaternion.identity);
+                    fishModel.SetActive(false);
 
-                Inventory.instance.AddFishItem(caughtFish, fishModel);
-                inventoryUI.UpdateInventoryUI();
-                Debug.Log($"Поймана рыба из {currentSeaType}!");
+                    Inventory.instance.AddFishItem(caughtFish, fishModel);
+                    inventoryUI.UpdateInventoryUI();
+
+                    feedbackText.text = $"<color=#00FF00>Поймана рыба из {currentSeaType}!</color>";
+                }
             }
         }
         else
         {
+            feedbackText.text = "Игрок не успел, рыба не поймана.";
             Debug.Log("Игрок не успел, рыба не поймана.");
         }
 
@@ -113,10 +125,10 @@ public class FishingManager : MonoBehaviour
         uiManager.ShowUI();
         isFishingActive = false;
         fishingButtonPhase.EndPhase();
-        fishingStartButton.SetActive(true);
 
         StartCoroutine(FishingEndSequence());
     }
+
 
 
 

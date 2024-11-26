@@ -16,8 +16,8 @@ MonoBehaviour:
   Name: "\u0423\u0434\u043E\u0447\u043A\u0430"
   Sprite: {fileID: 21300000, guid: a2bed65383227d74d9bb06bb5cbf650d, type: 3}
   Level: 1
-  rodlvlCommon: 0.5
+  rodlvlCommon: 0.45
   rodlvlRare: 0.3
   rodlvlEpic: 0.2
-  rodlvlMythic: 0
+  rodlvlMythic: 0.05
   rodlvlLegendary: 0

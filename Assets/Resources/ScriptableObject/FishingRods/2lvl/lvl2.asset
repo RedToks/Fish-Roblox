@@ -17,7 +17,7 @@ MonoBehaviour:
   Sprite: {fileID: 21300000, guid: de372a6c3c6d5a6418565149a08a4b79, type: 3}
   Level: 2
   rodlvlCommon: 0.3
-  rodlvlRare: 0.35
+  rodlvlRare: 0.3
   rodlvlEpic: 0.25
   rodlvlMythic: 0.1
-  rodlvlLegendary: 0
+  rodlvlLegendary: 0.05

@@ -12,12 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 038efdc102ba2e64d928b1625fcf1fc2, type: 3}
   m_Name: lvl3
   m_EditorClassIdentifier: 
-  Price: 1000000
+  Price: 100000
   Name: "\u0423\u0434\u043E\u0447\u043A\u0430"
   Sprite: {fileID: 21300000, guid: 7d97e8931c05fbd4c95b3ec3388af7ed, type: 3}
   Level: 3
   rodlvlCommon: 0.1
-  rodlvlRare: 0.3
-  rodlvlEpic: 0.3
+  rodlvlRare: 0.25
+  rodlvlEpic: 0.35
   rodlvlMythic: 0.2
   rodlvlLegendary: 0.1

@@ -23,4 +23,10 @@ public class FishingAreaTrigger : MonoBehaviour
             playerInteraction.SetCurrentFishingArea(null);
         }
     }
+
+    public void ResetFishingArea(PlayerInteraction playerInteraction)
+    {
+        IsInFishingArea = false;
+        playerInteraction.SetCurrentFishingArea(null);
+    }
 }

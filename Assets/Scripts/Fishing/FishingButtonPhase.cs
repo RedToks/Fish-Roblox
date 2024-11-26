@@ -121,7 +121,7 @@ public class FishingButtonPhase : MonoBehaviour
         }
         else
         {
-            feedbackText.text = $"Отлично! Ожидайте следующую кнопку ({currentClicks}/{targetClicks})";
+            feedbackText.text = $"<color=#00FF00>Отлично! Ожидайте следующую кнопку ({currentClicks}/{targetClicks})</color>";
             catchButton.SetActive(false);
             StartCoroutine(WaitAndShowNextCatchButton());
         }

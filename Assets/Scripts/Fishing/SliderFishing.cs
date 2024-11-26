@@ -71,7 +71,7 @@ public class SliderFishing : MonoBehaviour
             if (IsSliderInGreenZone())
             {
                 fishingProgressSlider.value += progressIncreaseRate * Time.deltaTime;
-                feedbackText.text = "Хорошо! Удерживайте слайдер в зоне!";
+                feedbackText.text = "<color=#00FF00>Хорошо! Удерживайте слайдер в зоне!</color>";
             }
             else
             {
@@ -81,7 +81,7 @@ public class SliderFishing : MonoBehaviour
 
             if (fishingProgressSlider.value >= 1f)
             {
-                feedbackText.text = "Вы поймали рыбу!";
+                feedbackText.text = "<color=#00FF00>Вы поймали рыбу!</color>";
                 StartCoroutine(FadeOutText());
                 EndFishing();
                 fishingManager.EndFishingProcess(true);

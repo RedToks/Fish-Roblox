@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using YG;
 
 public class PlayerExperience : MonoBehaviour
 {
@@ -19,7 +20,7 @@ public class PlayerExperience : MonoBehaviour
 
     private void Start()
     {
-        // Загружаем данные о уровне и опыте при старте
+        YandexGame.NewLeaderboardScores("LeaderBoardExperience", currentLevel);
         LoadPlayerData();
         UpdateUI();
     }
@@ -53,6 +54,7 @@ public class PlayerExperience : MonoBehaviour
             levelText.text = $"уровень {maxLevel}";
             experienceToNextLevelText.text = "Вы достигли максимального уровня";
             experienceSlider.value = experienceSlider.maxValue;
+            YandexGame.NewLeaderboardScores("LeaderBoardExperience", currentLevel);
         }
         else
         {
@@ -61,6 +63,7 @@ public class PlayerExperience : MonoBehaviour
 
             int experienceNeeded = experienceToNextLevel - currentExperience;
             experienceToNextLevelText.text = $"До след. уровня: {CurrencyFormatter.FormatCurrency(experienceNeeded)} опыта";
+            YandexGame.NewLeaderboardScores("LeaderBoardExperience", currentLevel);
         }
     }
 

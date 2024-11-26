@@ -263,7 +263,7 @@ public class Inventory : MonoBehaviour
         Destroy(fishModel);
 
         // ¬осстанавливаем исходное состо€ние рыбы
-        fishModel.transform.position = originalPosition;
+        fishModel.transform.position = originalPosition;    
         fishModel.transform.rotation = originalRotation;
         fishModel.transform.localScale = originalScale;
 

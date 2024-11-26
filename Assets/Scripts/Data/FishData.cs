@@ -124,7 +124,6 @@ public class FishData : ItemData
             return null;
         }
 
-        // Задаем вероятности на основе текущей удочки
         List<(Material[] materials, float probability)> materialCategories = new List<(Material[], float)>
     {
         (Resources.LoadAll<Material>($"Materials/{SeaType.ToString()}/Default"), currentRod.rodlvlCommon),
@@ -134,7 +133,6 @@ public class FishData : ItemData
         (Resources.LoadAll<Material>($"Materials/{SeaType.ToString()}/Legendary"), currentRod.rodlvlLegendary)
     };
 
-        // Выбираем случайный материал на основе вероятностей
         float randomValue = Random.value;
         float cumulativeProbability = 0;
 
@@ -171,7 +169,7 @@ public class FishData : ItemData
         string basePath = $"Materials/{SeaType.ToString()}";
 
         // Определяем редкость на основе папки, в которой находится материал
-        if (rodLevel >= 3 && IsMaterialInFolder(material, $"{basePath}/Legendary"))
+        if (rodLevel >= 2 && IsMaterialInFolder(material, $"{basePath}/Legendary"))
         {
             rarity = Rarity.Legendary;
         }
@@ -267,16 +265,16 @@ public class FishData : ItemData
                 multiplier = 1f;  // Множитель для Common
                 break;
             case Rarity.Rare:
-                multiplier = 1.6f;  // Множитель для Rare
+                multiplier = 2f;  // Множитель для Rare
                 break;
             case Rarity.Epic:
-                multiplier = 2.2f;  // Множитель для Epic
+                multiplier = 3.5f;  // Множитель для Epic
                 break;
             case Rarity.Mythic:
-                multiplier = 3.5f;  // Множитель для Mythic
+                multiplier = 6f;  // Множитель для Mythic
                 break;
             case Rarity.Legendary:
-                multiplier = 6f;  // Множитель для Legendary
+                multiplier = 10f;  // Множитель для Legendary
                 break;
             default:
                 Debug.LogWarning($"Unknown rarity: {rarity}");

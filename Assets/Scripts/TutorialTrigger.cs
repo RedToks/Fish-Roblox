@@ -7,9 +7,16 @@ public class TutorialTrigger : MonoBehaviour
     [SerializeField] private Button closeButton;
 
     private bool hasBeenTriggered = false;
+    private string tutorialKey; // Уникальный ключ для сохранения состояния
 
     private void Start()
     {
+        // Создаём уникальный ключ для каждого триггера на основе его имени
+        tutorialKey = $"{gameObject.name}_TutorialTriggered";
+
+        // Проверяем, был ли туториал уже показан
+        hasBeenTriggered = PlayerPrefs.GetInt(tutorialKey, 0) == 1;
+
         if (tutorialPanel != null)
         {
             tutorialPanel.SetActive(false);
@@ -29,6 +36,9 @@ public class TutorialTrigger : MonoBehaviour
         {
             ShowTutorial();
             hasBeenTriggered = true;
+            // Сохраняем состояние, чтобы туториал больше не показывался
+            PlayerPrefs.SetInt(tutorialKey, 1);
+            PlayerPrefs.Save();
         }
     }
 
@@ -37,7 +47,7 @@ public class TutorialTrigger : MonoBehaviour
         if (tutorialPanel != null)
         {
             tutorialPanel.SetActive(true);
-            Time.timeScale = 0f;
+            Time.timeScale = 0f; // Останавливаем время для фокуса на туториале
         }
     }
 
@@ -46,7 +56,7 @@ public class TutorialTrigger : MonoBehaviour
         if (tutorialPanel != null)
         {
             tutorialPanel.SetActive(false);
-            Time.timeScale = 1f;
+            Time.timeScale = 1f; // Возобновляем время
         }
     }
 }
